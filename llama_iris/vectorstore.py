@@ -283,7 +283,9 @@ LANGUAGE OBJECTSCRIPT
         from sqlalchemy import select, text
 
         self._initialize()
+        query_embedding = [float(v) for v in query.query_embedding]
 
+        rows = []
         with self._session() as session, session.begin():
             stmt = (
                 select(  # type: ignore
@@ -292,7 +294,7 @@ LANGUAGE OBJECTSCRIPT
                     self._table_class.text,
                     self._table_class.metadata_.label("metadata"),
                     self._table_class.embedding.func(
-                        "llamaindex_cosine_distance", query.query_embedding
+                        "llamaindex_cosine_distance", query_embedding
                     ).label("distance"),
                 )
                 .limit(query.similarity_top_k)
