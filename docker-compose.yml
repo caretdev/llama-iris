@@ -1,7 +1,7 @@
 version: "3"
 services:
   iris:
-    image: intersystemsdc/iris-community:2023.3-zpm
+    image: intersystemsdc/iris-community:2024.1-preview
     ports:
       - 6272:1972
       - 6273:52773
@@ -9,7 +9,6 @@ services:
       - IRISUSERNAME=test
       - IRISPASSWORD=test
       - IRISNAMESPACE=TEST
-    working_dir: /home/irisowner/langchain-iris
+    working_dir: /home/irisowner/llama-iris
     volumes:
-      - ./init.sh:/docker-entrypoint-initdb.d/init.sh
-      - ./:/home/irisowner/langchain-iris
+      - ./:/home/irisowner/llama-iris

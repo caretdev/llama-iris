@@ -10,6 +10,7 @@ from llama_index.vector_stores.types import (
 )
 from llama_index.vector_stores.utils import metadata_dict_to_node, node_to_metadata_dict
 
+
 _logger = logging.getLogger(__name__)
 
 
@@ -18,6 +19,7 @@ def get_data_model(
     index_name: str,
     schema_name: str,
     embed_dim: int = 1536,
+    native_vector: bool = False,
 ) -> Any:
     """
     This part create a dynamic sqlalchemy model with a new table.
@@ -25,6 +27,7 @@ def get_data_model(
     from sqlalchemy import Column
     from sqlalchemy.types import BIGINT, TEXT, VARCHAR
     from sqlalchemy_iris import IRISListBuild
+    from sqlalchemy_iris import IRISVector
 
     tablename = "data_%s" % index_name
     class_name = "Data%s" % index_name
@@ -36,7 +39,7 @@ def get_data_model(
         metadata_ = Column(TEXT)
         node_id = Column(VARCHAR(200))
         partition_id = Column(VARCHAR(200))
-        embedding = Column(IRISListBuild(embed_dim))  # type: ignore
+        embedding = Column(IRISVector(embed_dim) if native_vector else IRISListBuild(embed_dim))  # type: ignore
 
     return type(
         class_name,
@@ -63,6 +66,7 @@ class IRISVectorStore(BasePydanticVectorStore):
     _engine: Any = PrivateAttr()
     _session: Any = PrivateAttr()
     _is_initialized: bool = PrivateAttr(default=False)
+    _native_vector: bool = PrivateAttr(default=False)
 
     def __init__(
         self,
@@ -75,17 +79,6 @@ class IRISVectorStore(BasePydanticVectorStore):
     ) -> None:
         table_name = table_name.lower()
         schema_name = schema_name.lower()
-
-        from sqlalchemy.orm import declarative_base
-
-        # sqlalchemy model
-        self._base = declarative_base()
-        self._table_class = get_data_model(
-            self._base,
-            table_name,
-            schema_name,
-            embed_dim=embed_dim,
-        )
 
         super().__init__(
             connection_string=connection_string,
@@ -148,12 +141,28 @@ class IRISVectorStore(BasePydanticVectorStore):
 
         self._engine = create_engine(self.connection_string, echo=self.debug)
         self._session = sessionmaker(self._engine)
+        with self._engine.connect() as conn:
+            self._native_vector = conn.dialect.supports_vectors
+
+            from sqlalchemy.orm import declarative_base
+
+            # sqlalchemy model
+            self._base = declarative_base()
+            self._table_class = get_data_model(
+                self._base,
+                self.table_name,
+                self.schema_name,
+                embed_dim=self.embed_dim,
+                native_vector=self._native_vector,
+            )
 
     def _create_tables_if_not_exists(self) -> None:
         with self._session() as session, session.begin():
             self._base.metadata.create_all(session.connection())
 
     def _create_vector_functions(self) -> None:
+        if self._native_vector:
+            return
         try:
             from sqlalchemy import text
 
@@ -293,9 +302,15 @@ LANGUAGE OBJECTSCRIPT
                     self._table_class.node_id,
                     self._table_class.text,
                     self._table_class.metadata_.label("metadata"),
-                    self._table_class.embedding.func(
-                        "llamaindex_cosine_distance", query_embedding
-                    ).label("distance"),
+                    (
+                        self._table_class.embedding.cosine(query_embedding).label(
+                            "distance"
+                        )
+                        if self._native_vector
+                        else self._table_class.embedding.func(
+                            "llamaindex_cosine_distance", query_embedding
+                        ).label("distance")
+                    ),
                 )
                 .limit(query.similarity_top_k)
                 .order_by(text("distance asc"))
