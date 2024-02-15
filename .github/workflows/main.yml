@@ -94,7 +94,7 @@ jobs:
       run: |
         git config --global user.name 'ProjectBot'
         git config --global user.email 'bot@users.noreply.github.com'
-        poetry version $VERSION
+        poetry version ${{ steps.set-version.outputs.version }}
         poetry version patch
         git add pyproject.toml
         git commit -m 'auto bump version with release'
