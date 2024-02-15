@@ -9,7 +9,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Application Frameworks",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-version = "0.2.1"
+version = "0.2.2"
 description = "Interface between LLMs and your data"
 authors = ["Dmitry Maslennikov <dmitry@caretdev.com>"]
 keywords = ["LLM", "NLP", "RAG", "data", "devtools", "index", "retrieval", "iris"]
