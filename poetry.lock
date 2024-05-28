@@ -1643,13 +1643,13 @@ sqlcipher = ["sqlcipher3_binary"]
 
 [[package]]
 name = "sqlalchemy-iris"
-version = "0.13.0"
+version = "0.14.0"
 description = "InterSystems IRIS for SQLAlchemy"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "sqlalchemy-iris-0.13.0.tar.gz", hash = "sha256:9131847fa4a159d730d1dfbfe4719587ea74daf947414255f4a04f6a60efdccd"},
-    {file = "sqlalchemy_iris-0.13.0-py3-none-any.whl", hash = "sha256:b10363a3a81d61d8c389a8025cb971059517dbcb0f02c1069231336d313ffa4c"},
+    {file = "sqlalchemy_iris-0.14.0-py3-none-any.whl", hash = "sha256:8b1bede179accd6542e46fdd22e868c2296a77068719ddeadc9cffe86ff1f02f"},
+    {file = "sqlalchemy_iris-0.14.0.tar.gz", hash = "sha256:0ac975bb325eb1751a1b51db9a6dfc91d39a9ca699e563c1ddc7bb7cf3b10ddc"},
 ]
 
 [package.dependencies]
@@ -2101,4 +2101,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "ff345944e2f762f02bdf0ee470703ac437f43bbef099ed8aea6b6cda7178c756"
+content-hash = "5084f2370e334d3ef1bb699064d0f679f621dc6e957bd0c1682612ffb2a75b9c"
