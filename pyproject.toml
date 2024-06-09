@@ -21,7 +21,7 @@ repository = "https://github.com/caretdev/llama-iris"
 [tool.poetry.dependencies]
 python = "^3.9"
 SQLAlchemy = {extras = ["asyncio"], version = ">=1.4.49"}
-llama-index = "^0.9.46"
+llama-index = "^0.10.0"
 pandas = "^2.2.0"
 sqlalchemy-iris = "^0.14.0"
 

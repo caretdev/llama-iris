@@ -2,14 +2,14 @@ import asyncio
 from typing import Any, Generator, List, cast, Dict, Union
 
 import pytest
-from llama_index.schema import (
+from llama_index.legacy.schema import (
     NodeRelationship,
     RelatedNodeInfo,
     TextNode,
 )
 from llama_iris import IRISVectorStore
-from llama_index.vector_stores.loading import load_vector_store
-from llama_index.vector_stores.types import (
+from llama_index.legacy.vector_stores.loading import load_vector_store
+from llama_index.legacy.vector_stores.types import (
     VectorStoreQuery,
 )
 
